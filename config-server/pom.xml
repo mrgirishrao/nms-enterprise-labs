@@ -10,24 +10,25 @@
         <relativePath/>
     </parent>
     <groupId>com.telecom.nms</groupId>
-    <artifactId>eureka-server</artifactId>
+    <artifactId>config-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <java.version>21</java.version>
     </properties>
-
+<!-- 1. Added the actual active dependencies block -->
     <dependencies>
+        <!-- The core engine for the configuration hub -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <artifactId>spring-cloud-config-server</artifactId>
         </dependency>
+        <!-- Optional but highly recommended: for basic monitoring and endpoints -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,7 +37,7 @@
                 <version>2023.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
+                </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

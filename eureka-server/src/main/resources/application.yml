@@ -1,11 +1,7 @@
 server:
   port: 8761
-
 spring:
   application:
-    name: eureka-registry
-
-eureka:
-  client:
-    register-with-eureka: false # Do not register itself as a client
-    fetch-registry: false       # Do not pull a local cached copy of client mappings
+    name: eureka-registry # This exact name tells the config server which file to look for
+  config:
+    import: "configserver:http://localhost:8888" # Direct link to our centralized config hub

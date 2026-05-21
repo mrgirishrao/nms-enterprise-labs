@@ -1,0 +1,14 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native # Use local storage profile for quick sandbox architecture
+  cloud:
+    config:
+      server:
+        native:
+          # Tells the server to look directly into our shared-config directory
+          search-locations: "classpath:/shared-config"
