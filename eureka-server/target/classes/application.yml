@@ -1,0 +1,11 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-registry
+
+eureka:
+  client:
+    register-with-eureka: false # Do not register itself as a client
+    fetch-registry: false       # Do not pull a local cached copy of client mappings
