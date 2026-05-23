@@ -7,7 +7,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
-        <relativePath/>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.telecom.nms</groupId>
     <artifactId>eureka-server</artifactId>
@@ -39,4 +39,14 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <!-- FIXED: Added the missing build configuration layout -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

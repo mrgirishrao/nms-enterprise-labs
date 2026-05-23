@@ -1,0 +1,54 @@
+services:
+  config-server:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+    working_dir: /app/config-server
+    command: mvn spring-boot:run
+
+  eureka-server:
+    # Switched to a pristine, modern OpenJDK runtime that supports modern Docker engines perfectly
+    image: eclipse-temurin:21-jre-alpine
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    volumes:
+      - .:/app
+    working_dir: /app/eureka-server
+    # Executes the pre-compiled target JAR instantly without compiling or downloading Maven files!
+    command: sh -c "sleep 15 && java -jar target/*.jar --spring.config.import=configserver:http://config-server:8888"
+    depends_on:
+      - config-server
+
+  ticket-service-1:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: ticket-service-1
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+    working_dir: /app/ticket-service
+    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8081 --eureka.instance.instance-id=ticket-service-1 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+
+  ticket-service-2:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: ticket-service-2
+    ports:
+      - "8082:8082"
+    volumes:
+      - .:/app
+    working_dir: /app/ticket-service
+    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8082 --eureka.instance.instance-id=ticket-service-2 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+
+  alarm-processor:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: alarm-processor
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app/alarm-processor
+    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"

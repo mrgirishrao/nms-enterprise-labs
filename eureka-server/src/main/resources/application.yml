@@ -1,7 +1,0 @@
-server:
-  port: 8761
-spring:
-  application:
-    name: eureka-registry # This exact name tells the config server which file to look for
-  config:
-    import: "configserver:http://localhost:8888" # Direct link to our centralized config hub
