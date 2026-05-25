@@ -19,7 +19,7 @@ services:
       - .:/app
     working_dir: /app/eureka-server
     # Executes the pre-compiled target JAR instantly without compiling or downloading Maven files!
-    command: sh -c "sleep 15 && java -jar target/*.jar --spring.config.import=configserver:http://config-server:8888"
+    command: sh -c "sleep 30 && java -jar target/*.jar --spring.config.import=configserver:http://config-server:8888"
     depends_on:
       - config-server
 
@@ -31,7 +31,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app/ticket-service
-    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8081 --eureka.instance.instance-id=ticket-service-1 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8081 --eureka.instance.instance-id=ticket-service-1 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
 
   ticket-service-2:
     image: maven:3.9.6-eclipse-temurin-21
@@ -41,7 +41,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app/ticket-service
-    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8082 --eureka.instance.instance-id=ticket-service-2 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8082 --eureka.instance.instance-id=ticket-service-2 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
 
   alarm-processor:
     image: maven:3.9.6-eclipse-temurin-21
@@ -51,4 +51,23 @@ services:
     volumes:
       - .:/app
     working_dir: /app/alarm-processor
-    command: bash -c "sleep 35 && mvn spring-boot:run -Dspring-boot.run.arguments='--spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+    
+  gateway-service:
+    image: maven:3.9.6-eclipse-temurin-21
+    container_name: gateway-service
+    ports:
+      - "8060:8060"
+    volumes:
+      - .:/app
+    working_dir: /app/gateway-service
+    # Giving it a 35-second sleep delay to let Eureka stabilize first
+    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--spring.config.import=configserver:http://config-server:8888'"
+    depends_on:
+      - eureka-server
+  
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: zipkin
+    ports:
+      - "9411:9411"
