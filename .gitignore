@@ -1,0 +1,18 @@
+# --- Maven Target Directories ---
+# Ignores all compiled target folders in the root and every sub-module
+**/target/
+target/
+
+# --- Compiled Java class files ---
+*.class
+*.jar
+*.war
+*.ear
+
+# --- IDE & System Specific Files ---
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.DS_Store
