@@ -20,6 +20,7 @@ public class GatewaySecurityConfig {
             .authorizeExchange(exchanges -> exchanges
                 // Public Routes: Let discovery dashboards and configurations pass without tokens
                 .pathMatchers("/eureka/**").permitAll()
+                .pathMatchers("/api/v1/telemetry/dispatch").permitAll()
                 .pathMatchers("/actuator/**").permitAll()
                 
                 // Secured Routes: Every single NMS service endpoint requires an authenticated JWT passport
