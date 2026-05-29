@@ -29,31 +29,26 @@ services:
     depends_on:
       - config-server
 
-  ticket-service-1:
+  ticket-service:
     image: maven:3.9.6-eclipse-temurin-21
-    container_name: ticket-service-1
-    ports:
-      - "8081:8081"
     volumes:
       - .:/app
     working_dir: /app/ticket-service
     environment:
       - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
       - MAVEN_OPTS=-Xms32m -Xmx128m
-    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8081 --eureka.instance.instance-id=ticket-service-1 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
-
-  ticket-service-2:
-    image: maven:3.9.6-eclipse-temurin-21
-    container_name: ticket-service-2
-    ports:
-      - "8082:8082"
-    volumes:
-      - .:/app
-    working_dir: /app/ticket-service
-    environment:
-      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
-      - MAVEN_OPTS=-Xms32m -Xmx128m
-    command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--server.port=8082 --eureka.instance.instance-id=ticket-service-2 --spring.config.import=configserver:http://config-server:8888 --eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/'"
+      
+      # 🚀 THE CRITICAL FIX: Standardized Spring Relaxed Binding Environment Keys
+      - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
+      - SERVER_PORT=0
+      
+      # Cleaned up periods to underscores, completely removing mid-word dashes
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_INSTANCEID=ticket-service-replica-$${HOSTNAME}
+      
+    command: bash -c "sleep 38 && mvn spring-boot:run"
+    deploy:
+      replicas: 2
 
   alarm-processor:
     image: maven:3.9.6-eclipse-temurin-21
