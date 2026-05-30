@@ -45,7 +45,10 @@ public AlarmTelemetryConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
         // 🧠 AUTOMATION BUSINESS RULE EVALUATION
         if ("CRITICAL".equalsIgnoreCase(severity)) {
             log.info("⚠️ ALERT DETECTED AS CRITICAL! Initiating ticket auto-generation...");
-            
+        }
+        if ("CRASH".equalsIgnoreCase(severity)) {
+        throw new IllegalArgumentException("UNHANDLED TELECOM METRIC FAULT: Severity 'CRASH' is an illegal monitoring state!");
+    }    
             // Generate ticket entity details
             String shortTicketId = "TK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             String workOrderSummary = "AUTOMATED CRITICAL FAULT REPAIR REQUIRED: " + problem;
@@ -62,4 +65,3 @@ public AlarmTelemetryConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
             log.info("🎯 TicketEvent [{}] published to Kafka topic '{}'", shortTicketId, TICKET_TOPIC);
         }
     }
-}
