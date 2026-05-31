@@ -20,7 +20,14 @@ public class TelemetryIngestionBridge {
     }
 
     // 📥 Intercept the unvalidated text maps coming out of your gateway container
-    @KafkaListener(topics = "telecom-raw-telemetry", groupId = "nms-bridge-group")
+    @KafkaListener(
+    topics = "telecom-raw-telemetry", 
+    groupId = "nms-bridge-group",
+    properties = {
+        "spring.json.value.default.type=java.util.Map",
+        "spring.deserializer.value.delegate.class=org.springframework.kafka.support.serializer.JsonDeserializer"
+    }
+)
     public void processRawTelemetry(Map<String, Object> rawPayload) {
         log.info("📥 Ingestion Bridge: Captured raw payload map from gateway entry lane.");
 

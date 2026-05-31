@@ -26,15 +26,15 @@ public AlarmTelemetryConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @KafkaListener(topics = "telecom-network-alarms", groupId = "nms-alarm-processing-group")
+    @KafkaListener(topics = "telecom-network-alarms", groupId = "nms-alarm-processing-group-v1")
     public void consumeAlarmStream(
             @Payload AlarmTelemetryAvro message,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {
         
-        String equipmentId = (String) message.get("equipmentId");
-        String severity = (String) message.get("severity");
-        String problem = (String) message.get("problem");
+        String equipmentId =  message.get("equipmentId").toString();
+        String severity =  message.get("severity").toString();
+        String problem =  message.get("problem").toString();
 
         log.info("==================================================================");
         log.info("🚀 KAFKA STREAM INGESTED FROM PARTITION: {} AT OFFSET: {}", partition, offset);
