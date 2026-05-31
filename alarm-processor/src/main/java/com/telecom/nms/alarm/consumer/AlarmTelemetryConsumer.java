@@ -10,7 +10,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import java.util.Map;
+import com.telecom.nms.alarm.model.AlarmTelemetryAvro; // 🚀 Swap Map out for your Avro class!
 import java.util.UUID;
 
 @Service
@@ -28,7 +28,7 @@ public AlarmTelemetryConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
 
     @KafkaListener(topics = "telecom-network-alarms", groupId = "nms-alarm-processing-group")
     public void consumeAlarmStream(
-            @Payload Map<String, Object> message,
+            @Payload AlarmTelemetryAvro message,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {
         
@@ -49,6 +49,7 @@ public AlarmTelemetryConsumer(KafkaTemplate<String, Object> kafkaTemplate) {
         if ("CRASH".equalsIgnoreCase(severity)) {
         throw new IllegalArgumentException("UNHANDLED TELECOM METRIC FAULT: Severity 'CRASH' is an illegal monitoring state!");
     }    
+    
             // Generate ticket entity details
             String shortTicketId = "TK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             String workOrderSummary = "AUTOMATED CRITICAL FAULT REPAIR REQUIRED: " + problem;

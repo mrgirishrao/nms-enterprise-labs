@@ -11,7 +11,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/telemetry")
 public class TelemetryController {
 
-    private static final String TOPIC = "telecom-network-alarms";
+    private static final String TOPIC = "telecom-raw-telemetry";
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;

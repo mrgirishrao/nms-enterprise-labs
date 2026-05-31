@@ -59,8 +59,70 @@
     <groupId>org.springframework.kafka</groupId>
     <artifactId>spring-kafka</artifactId>
 </dependency>
+<dependency>
+    <groupId>io.confluent</groupId>
+    <artifactId>kafka-avro-serializer</artifactId>
+    <version>7.6.0</version>
+</dependency>
+<dependency>
+    <groupId>io.confluent</groupId>
+    <artifactId>kafka-protobuf-serializer</artifactId>
+    <version>7.6.0</version>
+</dependency>
     </dependencies>
+<repositories>
+    <repository>
+        <id>confluent</id>
+        <url>https://packages.confluent.io/maven/</url>
+    </repository>
+</repositories>
+<build>
+<extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+<plugins>
+    <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>1.11.3</version>
+        <executions>
+            <execution>
+                <phase>generate-sources</phase>
+                <goals>
+                    <goal>schema</goal>
+                </goals>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/resources/avro/</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/avro/</outputDirectory>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
 
+    <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+            <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
+            <protoSourceRoot>${project.basedir}/src/main/resources/protobuf/</protoSourceRoot>
+            <outputDirectory>${project.build.directory}/generated-sources/protobuf/</outputDirectory>
+            <clearOutputDirectory>false</clearOutputDirectory>
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>compile</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+</build>
     <dependencyManagement>
         <dependencies>
             <dependency>

@@ -1,0 +1,28 @@
+{
+  "type": "record",
+  "name": "AlarmTelemetryAvro",
+  "namespace": "com.telecom.nms.alarm.model",
+  "doc": "Strict Avro contract for cellular tower telemetry alarm signaling",
+  "fields": [
+    {
+      "name": "equipmentId",
+      "type": "string",
+      "doc": "The unique identifier of the base station (e.g., gNodeB-01)"
+    },
+    {
+      "name": "severity",
+      "type": "string",
+      "doc": "CRITICAL, MAJOR, MINOR, or WARNING"
+    },
+    {
+      "name": "problem",
+      "type": "string",
+      "doc": "The structural specific network error description text"
+    },
+    {
+      "name": "timestamp",
+      "type": "string",
+      "doc": "ISO-8601 string recording the exact event ingestion moment"
+    }
+  ]
+}

@@ -6,15 +6,14 @@ services:
       - "8888:8888"
     volumes:
       - .:/app
+      - shared-maven-cache:/root/.m2 # 🏎️ SHARED CACHE MOUNT
     working_dir: /app/config-server
     environment:
       - JAVA_TOOL_OPTIONS=-Xms64m -Xmx128m
       - MAVEN_OPTS=-Xms32m -Xmx128m
     command: mvn spring-boot:run
-    
 
   eureka-server:
-    # Switched to a pristine, modern OpenJDK runtime that supports modern Docker engines perfectly
     image: eclipse-temurin:21-jre-alpine
     container_name: eureka-server
     ports:
@@ -24,7 +23,6 @@ services:
     working_dir: /app/eureka-server
     environment:
       - JAVA_TOOL_OPTIONS=-Xms64m -Xmx128m
-    # Executes the pre-compiled target JAR instantly without compiling or downloading Maven files!
     command: sh -c "sleep 30 && java -jar target/*.jar --spring.config.import=configserver:http://config-server:8888"
     depends_on:
       - config-server
@@ -33,19 +31,15 @@ services:
     image: maven:3.9.6-eclipse-temurin-21
     volumes:
       - .:/app
+      - shared-maven-cache:/root/.m2 # 🏎️ SHARED CACHE MOUNT
     working_dir: /app/ticket-service
     environment:
       - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
       - MAVEN_OPTS=-Xms32m -Xmx128m
-      
-      # 🚀 THE CRITICAL FIX: Standardized Spring Relaxed Binding Environment Keys
       - SPRING_CONFIG_IMPORT=configserver:http://config-server:8888
       - SERVER_PORT=0
-      
-      # Cleaned up periods to underscores, completely removing mid-word dashes
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_INSTANCE_INSTANCEID=ticket-service-replica-$${HOSTNAME}
-      
     command: bash -c "sleep 38 && mvn spring-boot:run"
     deploy:
       replicas: 2
@@ -57,6 +51,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
+      - shared-maven-cache:/root/.m2 # 🏎️ SHARED CACHE MOUNT
     working_dir: /app/alarm-processor
     environment:
       - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
@@ -70,12 +65,11 @@ services:
       - "8060:8060"
     volumes:
       - .:/app
+      - shared-maven-cache:/root/.m2 # 🏎️ SHARED CACHE MOUNT
     working_dir: /app/gateway-service
     environment:
       - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
       - MAVEN_OPTS=-Xms32m -Xmx128m
-
-    # Giving it a 35-second sleep delay to let Eureka stabilize first
     command: bash -c "sleep 38 && mvn spring-boot:run -Dspring-boot.run.arguments='--spring.config.import=configserver:http://config-server:8888'"
     depends_on:
       - eureka-server
@@ -87,6 +81,7 @@ services:
       - "9411:9411"
     environment:
       - JAVA_OPTS=-Xms64m -Xmx128m
+
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.0
     container_name: keycloak
@@ -100,30 +95,39 @@ services:
       - JAVA_OPTS_APPEND=-Xms128m -Xmx256m
     ports:
       - "8083:8080"
-  # 🪵 NEW TELECOM ASYNCHRONOUS DATA SHOCK ABSORBER
+
   kafka:
     image: apache/kafka:3.7.2
     container_name: kafka
     ports:
       - "9094:9094"
     environment:
-      # 1. KRaft Node Core Setup
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
       - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      
-      # 2. Network Listeners (Docker bridge vs Codespace External Forwarding)
       - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      
-      # 3. High Availability Fallbacks for Single Broker Architecture
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_NUM_PARTITIONS=3
-      
-      # 🚀 CODESPACE MEMORY PROTECTION
       - KAFKA_HEAP_OPTS=-Xms128m -Xmx256m
+  
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.0
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka:9092
+      - SCHEMA_REGISTRY_HEAP_OPTS=-Xms64m -Xmx128m
+    depends_on:
+      - kafka
+
+# 🧱 1. THE ARCHITECTURAL RECOVERY: Register the shared disk loop at the base line boundary
+volumes:
+  shared-maven-cache:

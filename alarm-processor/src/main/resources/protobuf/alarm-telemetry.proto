@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.telecom.nms.alarm.model;
+
+// 🚀 Ensures the compiled Java stubs are outputted into tidy separate files
+option java_multiple_files = true;
+option java_package = "com.telecom.nms.alarm.model";
+option java_outer_classname = "AlarmTelemetryProtoProto";
+
+message AlarmTelemetryProto {
+  // Positional numeric index tags instruct the binary engine exactly where the field lives
+  string equipmentId = 1;
+  string severity = 2;
+  string problem = 3;
+  string timestamp = 4;
+}
